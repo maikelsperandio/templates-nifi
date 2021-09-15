@@ -1,0 +1,17 @@
+nifi version: 1.13.2
+Description: A flow that's responsible to read a message from Kafka and insert into Oracle
+Important thinks: 
+	Oracle Datetime format: ${dataChegada:toNumber():format("yyyy-MM-dd HH:mm:ss.SSS", "America/Sao_Paulo")} - This was the hardest config
+	JOLT remove empty strings: The following spec remove all empty string attributes from the json
+		{
+			"operation": "shift",
+				"spec": {
+				"*": {
+					"": null,
+					"*": {
+					  "$": "&2"
+					}
+				}
+			}
+		}
+flow: ConsumeKafka --> ConvertRecord (Converte message to json) --> EvaluateJsonPath --> UpdateAttribute --> AttribuitesToJson --> JOLTTransformation --> ConvertJsonTOSQL --> PutSQL (Save on Oracle)
